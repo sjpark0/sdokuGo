@@ -4,6 +4,45 @@ type FastSolver2 struct {
 	Solver
 }
 
+func (s *FastSolver2) GetAvailableNumber(sdoku []int, i int, j int) []int {
+	var index1 int
+	var index2 int
+	var isAvail bool
+	var numList []int = nil
+
+	for aa := 1; aa < 1+NUM_X*NUM_Y; aa++ {
+		isAvail = true
+		for m := 0; m < NUM_X*NUM_Y; m++ {
+			if sdoku[m+i*NUM_X*NUM_Y] == aa {
+				isAvail = false
+				break
+			}
+			if sdoku[j+m*NUM_X*NUM_Y] == aa {
+				isAvail = false
+				break
+			}
+		}
+
+		if isAvail == true {
+			index1 = (i / NUM_Y) * NUM_Y
+			index2 = (j / NUM_X) * NUM_X
+			for m := index1; m < index1+NUM_Y; m++ {
+				if isAvail == true {
+					for n := index2; n < index2+NUM_X; n++ {
+						if sdoku[n+m*NUM_X*NUM_Y] == aa {
+							isAvail = false
+							break
+						}
+					}
+				}
+			}
+		}
+		if isAvail == true {
+			numList = append(numList, aa)
+		}
+	}
+	return numList
+}
 func (s *FastSolver2) SolveSdoku(sdoku []int) {
 	var emptyList []COORD1 = nil
 	s.m_solved = nil
@@ -28,139 +67,53 @@ func (s *FastSolver2) SolveSdoku(sdoku []int) {
 	}
 }
 
-func (s *FastSolver2) AssignValue(sdoku []int, x int, y int, val int, availableList [][]int, emptyList []COORD1) {
-	index := x + y*NUM_X*NUM_Y
-	sdoku[index] = val
+func (s *FastSolver2) SolveSdoku1(sdoku []int, emptyList []COORD1) int {
+	sdokuTemp := make([]int, NUM_X*NUM_Y*NUM_X*NUM_Y)
+	copy(sdokuTemp, sdoku)
 
-	for i := 0; i < len(emptyList); i++ {
-		tmpList := availableList[emptyList[i].x+emptyList[i].y*NUM_X*NUM_Y]
+	//availableList := make([]int, NUM_X*NUM_Y)
+	var availableList []int = nil
+	emptyListTemp := make([]COORD1, len(emptyList))
+	copy(emptyListTemp, emptyList)
 
-		if emptyList[i].x == x {
-			for i := 0; i < len(tmpList); i++ {
-				if tmpList[i] == val {
-					tmpList = append(tmpList[:i], tmpList[i+1:]...)
-					break
-				}
-			}
-		} else if emptyList[i].y == y {
-			for i := 0; i < len(tmpList); i++ {
-				if tmpList[i] == val {
-					tmpList = append(tmpList[:i], tmpList[i+1:]...)
-					break
-				}
-			}
-		} else if emptyList[i].group == (x/NUM_X + y/NUM_Y*NUM_Y) {
-			for i := 0; i < len(tmpList); i++ {
-				if tmpList[i] == val {
-					tmpList = append(tmpList[:i], tmpList[i+1:]...)
-					break
-				}
-			}
+	pos := 0
+	for pos < len(emptyListTemp) {
+		availableList = s.GetAvailableNumber(sdokuTemp, emptyListTemp[pos].y, emptyListTemp[pos].x)
+		numList := len(availableList)
+		if numList == 0 {
+			return 0
+		}
+		if numList == 1 {
+			sdokuTemp[emptyListTemp[pos].x+emptyListTemp[pos].y*NUM_X*NUM_Y] = availableList[0]
+			//emptyListTemp = emptyListTemp[1:]
+			emptyListTemp = s.Solver.Remove(emptyListTemp, pos)
+			pos = 0
+		} else {
+			pos++
 		}
 	}
-}
-func (s *FastSolver2) SolveSdoku1(sdoku []int, emptyList []COORD1) int {
-	availableList := make([][]int, NUM_X*NUM_Y*NUM_X*NUM_Y)
-	for i := 0; i < NUM_X*NUM_Y*NUM_X*NUM_Y; i++ {
-		availableList[i] = make([]int, NUM_X*NUM_Y)
-	}
-	for i := 0; i < len(emptyList); i++ {
-		s.GetAvailableNumber(sdoku, emptyList[i].y, emptyList[i].x, availableList[emptyList[i].x+emptyList[i].y*NUM_X*NUM_Y])
+
+	if len(emptyListTemp) == 0 {
+		s.m_solved = append(s.m_solved, sdokuTemp)
+		return 1
 	}
 
-	result := s.SolveSdokuR(sdoku, availableList, emptyList)
+	result := 0
+
+	availableList = s.GetAvailableNumber(sdokuTemp, emptyListTemp[0].y, emptyListTemp[0].x)
+	numList := len(availableList)
+	tmp := emptyListTemp[0]
+	emptyListTemp = emptyListTemp[1:]
+
+	for i := 0; i < numList; i++ {
+		sdokuTemp[tmp.x+tmp.y*NUM_X*NUM_Y] = availableList[i]
+		tempResult := s.SolveSdoku1(sdokuTemp, emptyListTemp)
+		if tempResult > 1 {
+			result = 2
+			break
+		}
+		result += tempResult
+	}
+
 	return result
-}
-func (s *FastSolver2) SolveSdokuR(sdoku []int, availableList [][]int, emptyList []COORD1) int {
-	availableListTemp := make([][]int, NUM_X*NUM_Y*NUM_X*NUM_Y)
-    availableListTemp2 := make([][]int, NUM_X*NUM_Y*NUM_X*NUM_Y)
-	for i:=0;i<NUM_X*NUM_Y*NUM_X*NUM_Y;i++{
-		availableListTemp[i] = make([]int, NUM_X * NUM_Y)
-		copy(availableListTemp[i], availableList[[i]])
-
-		availableListTemp2[i] = make([]int, NUM_X * NUM_Y)
-		copy(availableListTemp2[i], availableList[[i]])
-
-	}
-    vector<COORD1> emptyListTemp;
-    vector<COORD1>::iterator iter;
-    
-    int numList;
-    int *sdokuTemp = new int[NUM_X * NUM_Y * NUM_X * NUM_Y];
-    memcpy(sdokuTemp, sdoku, NUM_X * NUM_Y * NUM_X * NUM_Y * sizeof(int));
-    emptyListTemp.clear();
-    for(iter = emptyList->begin();iter != emptyList->end();iter++){
-        emptyListTemp.push_back(*iter);
-        availableListTemp[iter->x + iter->y * NUM_X * NUM_Y] = availableList[iter->x + iter->y * NUM_X * NUM_Y];
-    }
-    
-    iter = emptyListTemp.begin();
-    while(iter != emptyListTemp.end()){
-        numList = (int)availableListTemp[iter->x + iter->y * NUM_X * NUM_Y].size();
-        if(numList == 0){
-            delete []sdokuTemp;
-            delete []availableListTemp;
-            delete []availableListTemp2;
-            return 0;
-        }
-        if(numList == 1){
-            COORD1 tmp = (*iter);
-            emptyListTemp.erase(iter);
-            AssignValue(sdokuTemp, tmp.x, tmp.y, availableListTemp[tmp.x + tmp.y * NUM_X * NUM_Y][0], availableListTemp, &emptyListTemp);
-            
-            iter = emptyListTemp.begin();
-        }
-        else{
-            iter++;
-        }
-    }
-    
-    if(emptyListTemp.size() == 0){
-        m_solved.push_back(sdokuTemp);
-        delete []availableListTemp;
-        delete []availableListTemp2;
-        return 1;
-    }
-    
-    int result = 0;
-    int tempResult;
-    
-    
-    iter = emptyListTemp.begin();
-    vector<int> tmpList = availableListTemp[iter->x + iter->y * NUM_X * NUM_Y];
-    numList = (int)tmpList.size();
-    COORD1 tmp = (*iter);
-    emptyListTemp.erase(iter);
-    result = 0;
-    
-    for(iter = emptyListTemp.begin();iter != emptyListTemp.end();iter++){
-        availableListTemp2[iter->x + iter->y * NUM_X * NUM_Y] = availableListTemp[iter->x + iter->y * NUM_X * NUM_Y];
-    }
-    for(int i=0;i<numList;i++){
-        AssignValue(sdokuTemp, tmp.x, tmp.y, tmpList[i], availableListTemp, &emptyListTemp);
-        tempResult = SolveSdokuR(sdokuTemp, availableListTemp, &emptyListTemp);
-        if(tempResult > 1){
-            result = 2;
-            break;
-        }
-        result += tempResult;
-        for(iter = emptyListTemp.begin();iter != emptyListTemp.end();iter++){
-            if(iter->x == tmp.x){
-                availableListTemp[iter->x + iter->y * NUM_X * NUM_Y] = availableListTemp2[iter->x + iter->y * NUM_X * NUM_Y];
-            }
-            else if(iter->y == tmp.y){
-                availableListTemp[iter->x + iter->y * NUM_X * NUM_Y] = availableListTemp2[iter->x + iter->y * NUM_X * NUM_Y];
-            }
-            /*else if((iter->x / NUM_X == tmp.x / NUM_X) && (iter->y / NUM_Y == tmp.y / NUM_Y)){
-                availableListTemp[iter->x + iter->y * NUM_X * NUM_Y] = availableListTemp2[iter->x + iter->y * NUM_X * NUM_Y];
-            }*/
-            else if(iter->group == (tmp.x / NUM_X + tmp.y / NUM_Y * NUM_Y)){
-                availableListTemp[iter->x + iter->y * NUM_X * NUM_Y] = availableListTemp2[iter->x + iter->y * NUM_X * NUM_Y];
-            }
-        }
-    }
-    delete []availableListTemp;
-    delete []availableListTemp2;
-    delete []sdokuTemp;
-    return result;
 }
