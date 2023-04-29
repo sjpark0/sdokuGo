@@ -42,7 +42,8 @@ func main() {
 	var fast1 Sdoku.FastSolver1
 	var fast2 Sdoku.FastSolver2
 	var fast3 Sdoku.FastSolver3
-
+	var newFast Sdoku.NewFastSolver
+	var newFast1 Sdoku.NewFastSolver1
 	copy(sdoku, sdokuOriginal)
 	//game = Sdoku.NewNaiveSolver()
 	naive.PrintSdoku(sdoku)
@@ -90,7 +91,27 @@ func main() {
 	fast3.SolveSdoku(sdoku)
 	end = time.Since(start)
 	fmt.Println("FastSolver3 => Time measured : ", end)
-	fast2.PrintSdoku(sdoku)
+	fast3.PrintSdoku(sdoku)
+	fmt.Println()
+
+	copy(sdoku, sdokuOriginal)
+	//game1 := Sdoku.NewFastSolver()
+	newFast.PrintSdoku(sdoku)
+	start = time.Now()
+	newFast.SolveSdoku(sdoku)
+	end = time.Since(start)
+	fmt.Println("NewFastSolver => Time measured : ", end)
+	newFast.PrintSdoku(sdoku)
+	fmt.Println()
+
+	copy(sdoku, sdokuOriginal)
+	//game1 := Sdoku.NewFastSolver()
+	newFast1.PrintSdoku(sdoku)
+	start = time.Now()
+	newFast1.SolveSdoku(sdoku)
+	end = time.Since(start)
+	fmt.Println("NewFastSolver1 => Time measured : ", end)
+	newFast1.PrintSdoku(sdoku)
 	fmt.Println()
 
 }

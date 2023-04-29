@@ -4,13 +4,6 @@ type FastSolver struct {
 	Solver
 }
 
-func NewFastSolver() *FastSolver {
-	s := new(FastSolver)
-	s.m_solved = nil
-
-	return s
-}
-
 func (s *FastSolver) SolveSdoku(sdoku []int) {
 	var emptyList []COORD1 = nil
 	s.m_solved = nil
