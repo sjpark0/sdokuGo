@@ -86,6 +86,11 @@ func (s *NewFastSolver2) SolveSdokuR(assignList []COORD2, emptyList []COORD2) in
 	assignListTemp := make([]COORD2, len(assignList))
 
 	copy(emptyListTemp, emptyList)
+	for i := 0; i < len(emptyList); i++ {
+		emptyListTemp[i].availalbeList = make([]int, len(emptyList[i].availalbeList))
+		copy(emptyListTemp[i].availalbeList, emptyList[i].availalbeList)
+	}
+
 	copy(assignListTemp, assignList)
 
 	pos := 0
@@ -120,7 +125,10 @@ func (s *NewFastSolver2) SolveSdokuR(assignList []COORD2, emptyList []COORD2) in
 
 	emptyListTemp2 := make([]COORD2, len(emptyListTemp))
 	copy(emptyListTemp2, emptyListTemp)
-
+	for i := 0; i < len(emptyListTemp); i++ {
+		emptyListTemp2[i].availalbeList = make([]int, len(emptyListTemp[i].availalbeList))
+		copy(emptyListTemp2[i].availalbeList, emptyListTemp[i].availalbeList)
+	}
 	for i := 0; i < numList; i++ {
 		s.AssignValue(assignListTemp, tmp.x, tmp.y, tmp.availalbeList[i], emptyListTemp)
 
