@@ -38,13 +38,16 @@ func main() {
 	var start time.Time
 	var end time.Duration
 	var naive Sdoku.NaiveSolver
+	var naive_0 Sdoku.NaiveSolver_0
 	var fast Sdoku.FastSolver
+	var fast_0 Sdoku.FastSolver_0
 	var fast1 Sdoku.FastSolver1
 	var fast2 Sdoku.FastSolver2
 	var fast3 Sdoku.FastSolver3
 	var newFast Sdoku.NewFastSolver
 	var newFast1 Sdoku.NewFastSolver1
 	var newFast2 Sdoku.NewFastSolver2
+	var newFast3 Sdoku.NewFastSolver3
 
 	copy(sdoku, sdokuOriginal)
 	//game = Sdoku.NewNaiveSolver()
@@ -58,12 +61,32 @@ func main() {
 
 	copy(sdoku, sdokuOriginal)
 	//game1 := Sdoku.NewFastSolver()
+	naive_0.PrintSdoku(sdoku)
+	start = time.Now()
+	naive_0.SolveSdoku(sdoku)
+	end = time.Since(start)
+	fmt.Println("NaiveSolver_0 => Time measured : ", end)
+	naive_0.PrintSdoku(sdoku)
+	fmt.Println()
+
+	copy(sdoku, sdokuOriginal)
+	//game1 := Sdoku.NewFastSolver()
 	fast.PrintSdoku(sdoku)
 	start = time.Now()
 	fast.SolveSdoku(sdoku)
 	end = time.Since(start)
 	fmt.Println("FastSolver => Time measured : ", end)
 	fast.PrintSdoku(sdoku)
+	fmt.Println()
+
+	copy(sdoku, sdokuOriginal)
+	//game1 := Sdoku.NewFastSolver()
+	fast_0.PrintSdoku(sdoku)
+	start = time.Now()
+	fast_0.SolveSdoku(sdoku)
+	end = time.Since(start)
+	fmt.Println("FastSolver_0 => Time measured : ", end)
+	fast_0.PrintSdoku(sdoku)
 	fmt.Println()
 
 	copy(sdoku, sdokuOriginal)
@@ -124,6 +147,16 @@ func main() {
 	end = time.Since(start)
 	fmt.Println("NewFastSolver2 => Time measured : ", end)
 	newFast2.PrintSdoku(sdoku)
+	fmt.Println()
+
+	copy(sdoku, sdokuOriginal)
+	//game1 := Sdoku.NewFastSolver()
+	newFast3.PrintSdoku(sdoku)
+	start = time.Now()
+	newFast3.SolveSdoku(sdoku)
+	end = time.Since(start)
+	fmt.Println("NewFastSolver3 => Time measured : ", end)
+	newFast3.PrintSdoku(sdoku)
 	fmt.Println()
 
 }

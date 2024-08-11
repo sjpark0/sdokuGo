@@ -105,7 +105,6 @@ func (s *FastSolver3) SolveSdoku1(sdoku []int, emptyList []COORD1) int {
 	for i := 0; i < len(emptyList); i++ {
 		availableList[emptyList[i].x+emptyList[i].y*NUM_X*NUM_Y] = s.GetAvailableNumber(sdoku, emptyList[i].y, emptyList[i].x)
 	}
-
 	result := s.SolveSdokuR(sdoku, availableList, emptyList)
 
 	return result

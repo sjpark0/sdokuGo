@@ -1,17 +1,17 @@
 package Sdoku
 
-type NaiveSolver struct {
+type NaiveSolver_0 struct {
 	Solver
 }
 
-/*func NewNaiveSolver() *NaiveSolver {
-	s := new(NaiveSolver)
+/*func NewNaiveSolver() *NaiveSolver_0 {
+	s := new(NaiveSolver_0)
 	s.m_solved = nil
 
 	return s
 }*/
 
-func (s *NaiveSolver) SolveSdoku(sdoku []int) {
+func (s *NaiveSolver_0) SolveSdoku(sdoku []int) {
 	var emptyList []COORD1 = nil
 	s.m_solved = nil
 	var tmpCoord COORD1
@@ -35,29 +35,28 @@ func (s *NaiveSolver) SolveSdoku(sdoku []int) {
 	}
 }
 
-func (s *NaiveSolver) SolveSdoku1(sdoku []int, emptyList []COORD1) int {
-	sdokuTemp := make([]int, NUM_X*NUM_Y*NUM_X*NUM_Y)
-	copy(sdokuTemp, sdoku)
+func (s *NaiveSolver_0) SolveSdoku1(sdoku []int, emptyList []COORD1) int {
 
 	if len(emptyList) == 0 {
+		sdokuTemp := make([]int, NUM_X*NUM_Y*NUM_X*NUM_Y)
+		copy(sdokuTemp, sdoku)
+
 		s.m_solved = append(s.m_solved, sdokuTemp)
 		return 1
 	}
 	result := 0
 	availableList := make([]int, NUM_X*NUM_Y)
-	emptyListTemp := make([]COORD1, len(emptyList)-1)
 	numList := s.Solver.GetAvailableNumber(sdoku, emptyList[0].y, emptyList[0].x, availableList)
 	if numList == 0 {
 		return 0
 	} else {
 		result := 0
-		for i := 1; i < len(emptyList); i++ {
-			emptyListTemp[i-1] = emptyList[i]
-		}
 
 		for i := 0; i < numList; i++ {
-			sdokuTemp[emptyList[0].x+emptyList[0].y*NUM_X*NUM_Y] = availableList[i]
-			tempResult := s.SolveSdoku1(sdokuTemp, emptyListTemp)
+			sdoku[emptyList[0].x+emptyList[0].y*NUM_X*NUM_Y] = availableList[i]
+			tempResult := s.SolveSdoku1(sdoku, emptyList[1:])
+			sdoku[emptyList[0].x+emptyList[0].y*NUM_X*NUM_Y] = 0
+
 			if tempResult > 1 {
 				result = 2
 				break
