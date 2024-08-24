@@ -68,13 +68,14 @@ func (s *FastSolver3) SolveSdoku(sdoku []int) {
 	}
 }
 
-func (s *FastSolver3) AssignValue(sdoku []int, x int, y int, val int, availableList [][]int, emptyList []COORD1) {
+func (s *FastSolver3) AssignValue(sdoku []int, x int, y int, val int, availableList [][]int, emptyList []COORD1) []int {
 	index := x + y*NUM_X*NUM_Y
 	sdoku[index] = val
+	res := make([]int, 0)
 	for i := 0; i < len(emptyList); i++ {
 		index1 := emptyList[i].x + emptyList[i].y*NUM_X*NUM_Y
 		tmpList := availableList[index1]
-
+		pre_len := len(availableList[index1])
 		if emptyList[i].x == x {
 			for m := 0; m < len(tmpList); m++ {
 				if tmpList[m] == val {
@@ -97,7 +98,12 @@ func (s *FastSolver3) AssignValue(sdoku []int, x int, y int, val int, availableL
 				}
 			}
 		}
+		post_len := len(availableList[index1])
+		if pre_len != post_len {
+			res = append(res, index1)
+		}
 	}
+	return res
 }
 func (s *FastSolver3) SolveSdoku1(sdoku []int, emptyList []COORD1) int {
 	availableList := make([][]int, NUM_X*NUM_Y*NUM_X*NUM_Y)
@@ -111,7 +117,7 @@ func (s *FastSolver3) SolveSdoku1(sdoku []int, emptyList []COORD1) int {
 }
 func (s *FastSolver3) SolveSdokuR(sdoku []int, availableList [][]int, emptyList []COORD1) int {
 	availableListTemp := make([][]int, NUM_X*NUM_Y*NUM_X*NUM_Y)
-	availableListTemp2 := make([][]int, NUM_X*NUM_Y*NUM_X*NUM_Y)
+	//availableListTemp2 := make([][]int, NUM_X*NUM_Y*NUM_X*NUM_Y)
 	for i := 0; i < len(emptyList); i++ {
 		index2 := emptyList[i].x + emptyList[i].y*NUM_X*NUM_Y
 		availableListTemp[index2] = make([]int, len(availableList[index2]))
@@ -154,23 +160,27 @@ func (s *FastSolver3) SolveSdokuR(sdoku []int, availableList [][]int, emptyList 
 	tmp := emptyListTemp[pos]
 	emptyListTemp = s.Remove(emptyListTemp, pos)
 
-	for i := 0; i < len(emptyListTemp); i++ {
+	/*for i := 0; i < len(emptyListTemp); i++ {
 		index2 := emptyListTemp[i].x + emptyListTemp[i].y*NUM_X*NUM_Y
 		availableListTemp2[index2] = make([]int, len(availableListTemp[index2]))
 		copy(availableListTemp2[index2], availableListTemp[index2])
-	}
+	}*/
 
 	for i := 0; i < numList; i++ {
 		//availableListTemp = s.AssignValue(sdokuTemp, tmp.x, tmp.y, tmpList[i], availableListTemp, emptyListTemp)
-		s.AssignValue(sdokuTemp, tmp.x, tmp.y, tmpList[i], availableListTemp, emptyListTemp)
+		val_list := s.AssignValue(sdokuTemp, tmp.x, tmp.y, tmpList[i], availableListTemp, emptyListTemp)
 		tempResult := s.SolveSdokuR(sdokuTemp, availableListTemp, emptyListTemp)
 		if tempResult > 1 {
 			result = 2
 			break
 		}
 		result += tempResult
-
-		for m := 0; m < len(emptyListTemp); m++ {
+		for m := 0; m < len(val_list); m++ {
+			availableListTemp[val_list[m]] = append(availableListTemp[val_list[m]], tmpList[i])
+			//availableListTemp[val_list[m]] = make([]int, len(availableListTemp2[val_list[m]]))
+			//copy(availableListTemp[val_list[m]], availableListTemp2[val_list[m]])
+		}
+		/*for m := 0; m < len(emptyListTemp); m++ {
 			index = emptyListTemp[m].x + emptyListTemp[m].y*NUM_X*NUM_Y
 			if emptyListTemp[m].x == tmp.x {
 				availableListTemp[index] = make([]int, len(availableListTemp2[index]))
@@ -182,7 +192,7 @@ func (s *FastSolver3) SolveSdokuR(sdoku []int, availableList [][]int, emptyList 
 				availableListTemp[index] = make([]int, len(availableListTemp2[index]))
 				copy(availableListTemp[index], availableListTemp2[index])
 			}
-		}
+		}*/
 	}
 	return result
 }

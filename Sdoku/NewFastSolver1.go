@@ -157,22 +157,24 @@ func (s *NewFastSolver1) SolveSdokuR(assignList []COORD1, availableList [][]int,
 				copy(availableListTemp[index], availableListTemp2[index])
 			}
 		}
+
 	}
 
 	return result
 }
-func (s *NewFastSolver1) AssignValue(assignList []COORD1, x int, y int, val int, availableList [][]int, emptyList []COORD1) {
+func (s *NewFastSolver1) AssignValue(assignList []COORD1, x int, y int, val int, availableList [][]int, emptyList []COORD1) []int {
 	var tmp COORD1
 	tmp.x = x
 	tmp.y = y
 	tmp.group = (x/NUM_X + y/NUM_Y*NUM_Y)
 	tmp.val = val
-
+	res := make([]int, 0)
 	//assignList = append(assignList, tmp)
 	assignList[len(assignList)-1].val = val
 	for i := 0; i < len(emptyList); i++ {
 		index1 := emptyList[i].x + emptyList[i].y*NUM_X*NUM_Y
 		tmpList := availableList[index1]
+		pre_len := len(availableList[index1])
 
 		if emptyList[i].x == x {
 			for m := 0; m < len(tmpList); m++ {
@@ -196,6 +198,10 @@ func (s *NewFastSolver1) AssignValue(assignList []COORD1, x int, y int, val int,
 				}
 			}
 		}
+		post_len := len(availableList[index1])
+		if pre_len != post_len {
+			res = append(res, index1)
+		}
 	}
-
+	return res
 }
